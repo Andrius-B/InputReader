@@ -50,10 +50,12 @@ void InputReader::ReadValues(){
     for(int i = 0; i < count; i++){
         if(inputs[i]->type == SLAVE_I2C_INPUTREADER){
             // reads the i2c slave and fetches its detected change
+            #ifdef USE_I2C_INPUTS
             Change c = ((SlaveInput*) inputs[i])->getChange();
             if(c.id > 0){
                 changes.AppendChange(c);
             }
+            #endif
         }else{
             //Serial.println("Reading value of input number:"+String(i));
             int readValue = inputs[i]->read();
@@ -65,9 +67,13 @@ void InputReader::ReadValues(){
                 c.before_value = inputs[i]->lastReadValue;
                 c.id = inputs[i]->id;
                 c.type = inputs[i]->type;
-                if(DEBUG)Serial.println("Change created, checking if significant");
+                #ifdef DEBUG
+                Serial.println("Change created, checking if significant");
+                #endif
                 if(c.isSignificant()){
-                    if(DEBUG)Serial.println("Change Significant, appending to change buffer!");
+                    #ifdef DEBUG
+                    Serial.println("Change Significant, appending to change buffer!");
+                    #endif
                     inputs[i]->lastReadValue = readValue;
                     changes.AppendChange(c);
                 }

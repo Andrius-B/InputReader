@@ -1,5 +1,5 @@
 #include "ChangeBuffer.h"
-#include "InputReader.h"
+#include "InputMappings.h"
 
 ChangeBuffer::ChangeBuffer(){
     Resize(20);
@@ -28,20 +28,26 @@ void ChangeBuffer::Resize(int size){
 }
 
 void ChangeBuffer::AppendChange(Change c){
-    if(DEBUG){
+    #ifdef DEBUG
         Serial.println("Adding change to buffer:");
         Serial.println("Change id:\t"+String(c.id));
         Serial.println("Change type:\t"+String(c.type));
         Serial.println("Change before:\t"+String(c.before_value));
         Serial.println("Change after:\t"+String(c.after_value));
         Serial.println("Current buffer size is:"+String(this->size));
-    }
+    #endif
     if(c.type == ANALOG_I2C_INPUT || c.type == ANALOG_INPUT){
-        if(DEBUG)Serial.println("Change is analog, searching for one to overwrite");
+        #ifdef DEBUG
+        Serial.println("Change is analog, searching for one to overwrite");
+        #endif
         for(int i = 0; i < this->size; i++){
             // overwrite analog change events
             if(slotUsed[i] == true && changes[i].id == c.id){
-                if(DEBUG)Serial.println("Found analog with the same id, overwritting");
+
+                #ifdef DEBUG
+                Serial.println("Found analog with the same id, overwritting");
+                #endif
+                
                 changes[i].after_value = c.after_value;
                 changes[i].before_value = c.before_value;
                 return;
@@ -53,14 +59,19 @@ void ChangeBuffer::AppendChange(Change c){
         for(int i = 0; i < this->size; i++){
             // overwrite analog change events
             if(slotUsed[i] == true && changes[i].id == c.id){
-                if(DEBUG)Serial.println("Found analog with the same id, overwritting");
+                #ifdef DEBUG
+                Serial.println("Found analog with the same id, overwritting");
+                #endif
                 changes[i].after_value += c.after_value;
                 return;
             }
         }
     }
 
-    if(DEBUG)Serial.println("Searching for an empty slot to fit in!");
+    #ifdef DEBUG
+    Serial.println("Searching for an empty slot to fit in!");
+    #endif
+
     //write change to the first unoccupied spot
     for(int i = 0; i < this->size; i++){
         //Serial.println("Slot at:"+String(i)+" is used:"+String(slotUsed[i]));
@@ -72,11 +83,16 @@ void ChangeBuffer::AppendChange(Change c){
             changes[i].type = c.type;
             changes[i].after_value = c.after_value;
             changes[i].before_value = c.before_value;
-            if(DEBUG)Serial.println("Change written to buffer at position:"+String(i));
+            #ifdef DEBUG
+            Serial.println("Change written to buffer at position:"+String(i));
+            #endif
             return;
         }
     }
-    if(DEBUG)Serial.println("Buffer seems to be full, overwritting the first element!");
+
+    #ifdef DEBUG
+    Serial.println("Buffer seems to be full, overwritting the first element!");
+    #endif
     /**
      * In case the buffer is full, just replace the first element,
      * this is because fresh events are more important than old ones. 
@@ -89,12 +105,14 @@ void ChangeBuffer::AppendChange(Change c){
 }
 
 Change ChangeBuffer::PopChange(){
-    if(DEBUG)Serial.println("Popping change from buffer");
+    #ifdef DEBUG
+    Serial.println("Popping change from buffer");
     /**
      * Try to find an event at a different position than was returned last time
      */
-    if(DEBUG)Serial.println("Looking for change other than lastPopped (which is:"+String(lastPopped)+")");
-    
+    Serial.println("Looking for change other than lastPopped (which is:"+String(lastPopped)+")");
+    #endif
+
     if(lastPopped >=0){
         /**
          * First we need to find out if the last popped element is not the last used element in the list
@@ -128,7 +146,9 @@ Change ChangeBuffer::PopChange(){
     /**
     * If no event at a different position is found, return the same event
     */
-    if(DEBUG)Serial.println("Looking for any change whatsoever:");
+    #ifdef DEBUG
+    Serial.println("Looking for any change whatsoever:");
+    #endif
     for(int i = 0; i < size; i++){
         if(slotUsed[i] == true){
             slotUsed[i] = false;
@@ -141,8 +161,9 @@ Change ChangeBuffer::PopChange(){
             return c;
         }
     }
-
-    if(DEBUG)Serial.println("No change found :(");
+    #ifdef DEBUG
+    Serial.println("No change found :(");
+    #endif
     /*
     * If no change is found return a change with a null event
     */
@@ -171,4 +192,49 @@ void ChangeBuffer::PrintChanges(){
             Serial.println("Change of id #"+String(id)+" from "+String(before) + " -> " + String(after));
         }
     }
+}
+
+
+Change::Change(){;}
+
+
+bool Change::operator==(const Change& c){
+    return (this->id == c.id &&
+           this->type == c.type &&
+           this->after_value == c.after_value);
+}
+
+bool Change::operator!=(const Change& c){
+    return (this->id != c.id ||
+           this->type != c.type ||
+           this->after_value != c.after_value);
+}
+
+// bool Change::operator!=(Change r, Change){
+//     return !(this == c)
+// }
+
+Change::Change(uint8_t * data){
+    this->id = data[0];
+    this->type = data[1];
+    this->after_value = (( data[2] << 24 ) |
+                         ( data[3] << 16 ) |
+                         ( data[4] << 8  ) |
+                         ( data[5] ));
+}
+void Change::set(uint8_t * data){
+    this->id = data[0];
+    this->type = data[1];
+    this->after_value = (( data[2] << 24 ) |
+                         ( data[3] << 16 ) |
+                         ( data[4] << 8  ) |
+                         ( data[5] ));
+}
+
+
+void Change::set(const Change& other){
+    this->id = other.id;
+    this->type = other.type;
+    this->after_value = other.after_value;
+    this->before_value = other.before_value;
 }

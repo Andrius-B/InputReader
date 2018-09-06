@@ -8,27 +8,23 @@
 #include <Adafruit_ADS1015.h>
 #endif
 
-#ifndef DEBUG
-#define DEBUG false
-#endif
+
+//#define DEBUG 1
+
 
 #ifdef USE_ROTARY_ENCODERS
 #include <Encoder.h>
 #endif
 
+#ifdef USE_I2C_INPUTS
 #include <Wire.h>
+#endif
+
 #include "Arduino.h"
 #include "ChangeBuffer.h"
+#include "InputMappings.h"
 
 #define CHANGE_BUF_SIZE 35
-
-//the definitions for all available different input types (corresponding to classes)
-#define INVALID_INPUT 0xff
-#define DIGITAL_INPUT 0x00
-#define ANALOG_INPUT 0x01
-#define ANALOG_I2C_INPUT 0x02
-#define ROTARY_ENCODER_INPUT 0x03
-#define SLAVE_I2C_INPUTREADER 0x04
 
 class Input{
     public:
@@ -62,6 +58,8 @@ class RotaryEncoderInput: public Input{
 };
 #endif
 
+
+#ifdef USE_I2C_INPUTS
 class SlaveInput: public Input{
     public:
     uint8_t * i2cBuf = new uint8_t[6];
@@ -83,6 +81,7 @@ class SlaveInput: public Input{
         return c;
     }
 };
+#endif
 
 class DigitalInput: public Input{
     public:
