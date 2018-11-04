@@ -1,5 +1,6 @@
 #ifndef InputReader_h
 #define InputReader_h
+#include "InputReaderConfig.h"
 /**
  * Note to self: this adafruit lib does not check for redefinitions
  * Also I modified it - removed the Wire.begin(5,4) in the begin function
@@ -7,9 +8,6 @@
 #ifdef USE_I2C_INPUTS
 #include <Adafruit_ADS1015.h>
 #endif
-
-
-//#define DEBUG 1
 
 
 #ifdef USE_ROTARY_ENCODERS
@@ -22,6 +20,7 @@
 
 #include "Arduino.h"
 #include "ChangeBuffer.h"
+#include "Change.h"
 #include "InputMappings.h"
 
 #define CHANGE_BUF_SIZE 35
@@ -43,6 +42,7 @@ class AnalogI2cInput: public Input{
     virtual int32_t read(){
         return sensor->readADC_SingleEnded(pin);
     }
+    uint32_t changeAccumulator = 0;
   };
 #endif
 

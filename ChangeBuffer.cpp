@@ -57,7 +57,7 @@ void ChangeBuffer::AppendChange(Change c){
         //to the next case:
     }else if(c.type == ROTARY_ENCODER_INPUT){
         for(int i = 0; i < this->size; i++){
-            // overwrite analog change events
+            // overwrite rotary encoder change events
             if(slotUsed[i] == true && changes[i].id == c.id){
                 #ifdef DEBUG
                 Serial.println("Found analog with the same id, overwritting");
@@ -173,14 +173,6 @@ Change ChangeBuffer::PopChange(){
     return c;
 }
 
-bool Change::isSignificant(){
-    if(type == ANALOG_INPUT || type == ANALOG_I2C_INPUT){
-    if(abs(after_value - before_value) < 10){
-      return false; // remove jitter from low quality pots  
-    }
-  }
-  return true;
-}
 
 void ChangeBuffer::PrintChanges(){
     for(int i = 0; i < size; i++){
@@ -195,46 +187,3 @@ void ChangeBuffer::PrintChanges(){
 }
 
 
-Change::Change(){;}
-
-
-bool Change::operator==(const Change& c){
-    return (this->id == c.id &&
-           this->type == c.type &&
-           this->after_value == c.after_value);
-}
-
-bool Change::operator!=(const Change& c){
-    return (this->id != c.id ||
-           this->type != c.type ||
-           this->after_value != c.after_value);
-}
-
-// bool Change::operator!=(Change r, Change){
-//     return !(this == c)
-// }
-
-Change::Change(uint8_t * data){
-    this->id = data[0];
-    this->type = data[1];
-    this->after_value = (( data[2] << 24 ) |
-                         ( data[3] << 16 ) |
-                         ( data[4] << 8  ) |
-                         ( data[5] ));
-}
-void Change::set(uint8_t * data){
-    this->id = data[0];
-    this->type = data[1];
-    this->after_value = (( data[2] << 24 ) |
-                         ( data[3] << 16 ) |
-                         ( data[4] << 8  ) |
-                         ( data[5] ));
-}
-
-
-void Change::set(const Change& other){
-    this->id = other.id;
-    this->type = other.type;
-    this->after_value = other.after_value;
-    this->before_value = other.before_value;
-}

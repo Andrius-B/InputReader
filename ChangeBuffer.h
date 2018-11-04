@@ -1,22 +1,8 @@
 #ifndef ChangeBuffer_h
 #define ChangeBuffer_h
 #include "Arduino.h"
-
-class Change{
-    public:
-    uint8_t type;
-    uint8_t id;
-    int32_t after_value;
-    int32_t before_value;
-    bool isSignificant();
-
-    Change();
-    Change(uint8_t * data);
-    void set(uint8_t * data);
-    void set(const Change& other);
-    bool operator==(const Change& c);
-    bool operator!=(const Change& c);
-};
+#include "InputReaderConfig.h"
+#include "Change.h"
 
 class ChangeBuffer{
     Change * changes;

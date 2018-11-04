@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "InputReader.h"
 #include "ChangeBuffer.h"
+#include "InputReaderConfig.h"
 
 int32_t DigitalInput::read(){
     int readVal = digitalRead(pin);
@@ -56,21 +57,29 @@ void InputReader::ReadValues(){
                 changes.AppendChange(c);
             }
             #endif
-        }else{
+        }else if(inputs[i]->type == ANALOG_I2C_INPUT){
             //Serial.println("Reading value of input number:"+String(i));
             int readValue = inputs[i]->read();
             //Serial.println("Sensor read:"+String(readValue));
             if(readValue != inputs[i]->lastReadValue){
                 //Serial.println("Read value is different from the state, creating a change!");
                 Change c;
-                c.after_value = readValue;
+                #ifdef USE_I2C_INPUTS
                 c.before_value = inputs[i]->lastReadValue;
+                ((AnalogI2cInput *) inputs[i])->changeAccumulator =
+                    (((AnalogI2cInput *) inputs[i])->changeAccumulator * (1.f-ANALOG_INPUT_ACCUMULATOR_INFLUENCE)) + readValue * ANALOG_INPUT_ACCUMULATOR_INFLUENCE;
+                // Serial.println("After accumulating change:"+String((((AnalogI2cInput *) inputs[i])->changeAccumulator)));
+                c.after_value = ((AnalogI2cInput *) inputs[i])->changeAccumulator;
+                readValue = c.after_value;
+                #endif
+                
+                
                 c.id = inputs[i]->id;
                 c.type = inputs[i]->type;
                 #ifdef DEBUG
                 Serial.println("Change created, checking if significant");
                 #endif
-                if(c.isSignificant()){
+                if(isSignificant(&c)){
                     #ifdef DEBUG
                     Serial.println("Change Significant, appending to change buffer!");
                     #endif
