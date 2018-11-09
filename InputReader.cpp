@@ -47,7 +47,9 @@ Change InputReader::PopChange(){
 }
 
 void InputReader::ReadValues(){
-    //Serial.println("Reading values!");
+    #ifdef DEBUG
+    // Serial.println("Reading values!");
+    #endif
     for(int i = 0; i < count; i++){
         if(inputs[i]->type == SLAVE_I2C_INPUTREADER){
             // reads the i2c slave and fetches its detected change
@@ -86,6 +88,21 @@ void InputReader::ReadValues(){
                     inputs[i]->lastReadValue = readValue;
                     changes.AppendChange(c);
                 }
+            }
+        }else{
+            Change c;
+            int readValue = inputs[i]->read();
+            c.id = inputs[i]->id;
+            c.type = inputs[i]->type;
+
+            c.before_value = inputs[i]->lastReadValue;
+            c.after_value = readValue;
+            if(c.before_value != c.after_value){
+                inputs[i]->lastReadValue = readValue;
+                #ifdef DEBUG
+                Serial.println("Adding change to changeBuffer");
+                #endif
+                changes.AppendChange(c);
             }
         }
     }

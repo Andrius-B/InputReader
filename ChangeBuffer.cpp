@@ -60,7 +60,7 @@ void ChangeBuffer::AppendChange(Change c){
             // overwrite rotary encoder change events
             if(slotUsed[i] == true && changes[i].id == c.id){
                 #ifdef DEBUG
-                Serial.println("Found analog with the same id, overwritting");
+                Serial.println("Found rotary with the same id, adding");
                 #endif
                 changes[i].after_value += c.after_value;
                 return;

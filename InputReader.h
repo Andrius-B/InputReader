@@ -14,7 +14,7 @@
 #include <Encoder.h>
 #endif
 
-#ifdef USE_I2C_INPUTS
+#ifdef INCLUDE_WIRE
 #include <Wire.h>
 #endif
 

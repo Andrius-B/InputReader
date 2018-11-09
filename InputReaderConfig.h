@@ -1,12 +1,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// #define DEBUG
+// #define DEBUG true
 
 //accessory config
-#define USE_I2C_INPUTS true
-// #ifdef USE_ROTARY_ENCODERS
+// #define USE_I2C_INPUTS true
+// #define USE_ROTARY_ENCODERS
 // #define SLAVE_NANO_ADDRESS 0x06
+// #define INCLUDE_WIRE
 
 //inner-workings config
 /**
