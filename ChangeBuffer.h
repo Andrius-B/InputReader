@@ -1,5 +1,5 @@
-#ifndef ChangeBuffer_h
-#define ChangeBuffer_h
+#ifndef _CHANGE_BUFFER_H
+#define _CHANGE_BUFFER_H
 #include "Arduino.h"
 #include "InputReaderConfig.h"
 #include "Change.h"
@@ -12,9 +12,9 @@ class ChangeBuffer{
     public:
     ChangeBuffer(int size);
     ChangeBuffer();
-    void Resize(int size);
-    void AppendChange(Change c);
-    Change PopChange();
-    void PrintChanges();
+    void resize(int size);
+    void appendChange(Change c);
+    Change popChange();
+    void printChanges();
 };
 #endif

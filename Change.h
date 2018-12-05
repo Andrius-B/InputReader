@@ -6,6 +6,7 @@ extern "C" {
 #ifndef CHANGE_H
 #define CHANGE_H
 #include <stdint.h>
+#include <stdlib.h>
 
 
 typedef struct Change_type{

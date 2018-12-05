@@ -2,7 +2,7 @@
 #include "InputMappings.h"
 
 ChangeBuffer::ChangeBuffer(){
-    Resize(20);
+    resize(20);
 }
 
 ChangeBuffer::ChangeBuffer(int size){
@@ -15,7 +15,7 @@ ChangeBuffer::ChangeBuffer(int size){
     }
 }
 
-void ChangeBuffer::Resize(int size){
+void ChangeBuffer::resize(int size){
     this->size = size;
     delete[] changes;
     changes = new Change[size];
@@ -27,8 +27,8 @@ void ChangeBuffer::Resize(int size){
     }
 }
 
-void ChangeBuffer::AppendChange(Change c){
-    #ifdef DEBUG
+void ChangeBuffer::appendChange(Change c){
+    #ifdef DEBUG_CHANGE_BUFFER
         Serial.println("Adding change to buffer:");
         Serial.println("Change id:\t"+String(c.id));
         Serial.println("Change type:\t"+String(c.type));
@@ -37,14 +37,14 @@ void ChangeBuffer::AppendChange(Change c){
         Serial.println("Current buffer size is:"+String(this->size));
     #endif
     if(c.type == ANALOG_I2C_INPUT || c.type == ANALOG_INPUT){
-        #ifdef DEBUG
+        #ifdef DEBUG_CHANGE_BUFFER
         Serial.println("Change is analog, searching for one to overwrite");
         #endif
         for(int i = 0; i < this->size; i++){
             // overwrite analog change events
             if(slotUsed[i] == true && changes[i].id == c.id){
 
-                #ifdef DEBUG
+                #ifdef DEBUG_CHANGE_BUFFER
                 Serial.println("Found analog with the same id, overwritting");
                 #endif
                 
@@ -59,7 +59,7 @@ void ChangeBuffer::AppendChange(Change c){
         for(int i = 0; i < this->size; i++){
             // overwrite rotary encoder change events
             if(slotUsed[i] == true && changes[i].id == c.id){
-                #ifdef DEBUG
+                #ifdef DEBUG_CHANGE_BUFFER
                 Serial.println("Found rotary with the same id, adding");
                 #endif
                 changes[i].after_value += c.after_value;
@@ -68,7 +68,7 @@ void ChangeBuffer::AppendChange(Change c){
         }
     }
 
-    #ifdef DEBUG
+    #ifdef DEBUG_CHANGE_BUFFER
     Serial.println("Searching for an empty slot to fit in!");
     #endif
 
@@ -83,14 +83,14 @@ void ChangeBuffer::AppendChange(Change c){
             changes[i].type = c.type;
             changes[i].after_value = c.after_value;
             changes[i].before_value = c.before_value;
-            #ifdef DEBUG
+            #ifdef DEBUG_CHANGE_BUFFER
             Serial.println("Change written to buffer at position:"+String(i));
             #endif
             return;
         }
     }
 
-    #ifdef DEBUG
+    #ifdef DEBUG_CHANGE_BUFFER
     Serial.println("Buffer seems to be full, overwritting the first element!");
     #endif
     /**
@@ -104,8 +104,8 @@ void ChangeBuffer::AppendChange(Change c){
     changes[0].before_value = c.before_value;
 }
 
-Change ChangeBuffer::PopChange(){
-    #ifdef DEBUG
+Change ChangeBuffer::popChange(){
+    #ifdef DEBUG_CHANGE_BUFFER
     Serial.println("Popping change from buffer");
     /**
      * Try to find an event at a different position than was returned last time
@@ -146,7 +146,7 @@ Change ChangeBuffer::PopChange(){
     /**
     * If no event at a different position is found, return the same event
     */
-    #ifdef DEBUG
+    #ifdef DEBUG_CHANGE_BUFFER
     Serial.println("Looking for any change whatsoever:");
     #endif
     for(int i = 0; i < size; i++){
@@ -161,7 +161,7 @@ Change ChangeBuffer::PopChange(){
             return c;
         }
     }
-    #ifdef DEBUG
+    #ifdef DEBUG_CHANGE_BUFFER
     Serial.println("No change found :(");
     #endif
     /*
@@ -174,7 +174,7 @@ Change ChangeBuffer::PopChange(){
 }
 
 
-void ChangeBuffer::PrintChanges(){
+void ChangeBuffer::printChanges(){
     for(int i = 0; i < size; i++){
         if(slotUsed[i] == true && changes[i].id>=0){
             int id, before, after;

@@ -3,7 +3,7 @@
 
 //the definitions for all available different input types (corresponding to classes)
 #define INVALID_INPUT 0xff
-#define DIGITAL_INPUT 0x00
+#define DIGITAL_INPUT 0x05
 #define ANALOG_INPUT 0x01
 #define ANALOG_I2C_INPUT 0x02
 #define ROTARY_ENCODER_INPUT 0x03

@@ -1,7 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// #define DEBUG true
+#define DEBUG true
+#define DEBUG_CHANGE_BUFFER true
 
 //accessory config
 // #define USE_I2C_INPUTS true
