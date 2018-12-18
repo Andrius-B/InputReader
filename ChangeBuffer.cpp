@@ -1,11 +1,15 @@
 #include "ChangeBuffer.h"
 #include "InputMappings.h"
 
+// #define DEBUG_CHANGE_BUFFER
+
 ChangeBuffer::ChangeBuffer(){
+    _c = new Change();
     resize(20);
 }
 
 ChangeBuffer::ChangeBuffer(int size){
+    _c = new Change();
     this->size = size;
     changes = new Change[size];
     slotUsed = new bool[size];
@@ -27,42 +31,43 @@ void ChangeBuffer::resize(int size){
     }
 }
 
-void ChangeBuffer::appendChange(Change c){
+void ChangeBuffer::appendChange(Change * c){
     #ifdef DEBUG_CHANGE_BUFFER
         Serial.println("Adding change to buffer:");
-        Serial.println("Change id:\t"+String(c.id));
-        Serial.println("Change type:\t"+String(c.type));
-        Serial.println("Change before:\t"+String(c.before_value));
-        Serial.println("Change after:\t"+String(c.after_value));
+        Serial.println("Change id:\t"+String(c->id));
+        Serial.println("Change type:\t"+String(c->type));
+        Serial.println("Change before:\t"+String(c->before_value));
+        Serial.println("Change after:\t"+String(c->after_value));
         Serial.println("Current buffer size is:"+String(this->size));
     #endif
-    if(c.type == ANALOG_I2C_INPUT || c.type == ANALOG_INPUT){
+    if(c->type == ANALOG_I2C_INPUT || c->type == ANALOG_INPUT){
         #ifdef DEBUG_CHANGE_BUFFER
         Serial.println("Change is analog, searching for one to overwrite");
         #endif
         for(int i = 0; i < this->size; i++){
             // overwrite analog change events
-            if(slotUsed[i] == true && changes[i].id == c.id){
+            if(slotUsed[i] == true && changes[i].id == c->id){
 
                 #ifdef DEBUG_CHANGE_BUFFER
                 Serial.println("Found analog with the same id, overwritting");
                 #endif
-                
-                changes[i].after_value = c.after_value;
-                changes[i].before_value = c.before_value;
+                // changes[i].id = c->id;
+                // changes[i].type = c->type;
+                changes[i].after_value = c->after_value;
+                changes[i].before_value = c->before_value;
                 return;
             }
         }
         //in case where this is the first instance of this particular analog change, fall through
         //to the next case:
-    }else if(c.type == ROTARY_ENCODER_INPUT){
+    }else if(c->type == ROTARY_ENCODER_INPUT){
         for(int i = 0; i < this->size; i++){
             // overwrite rotary encoder change events
-            if(slotUsed[i] == true && changes[i].id == c.id){
+            if(slotUsed[i] == true && changes[i].id == c->id){
                 #ifdef DEBUG_CHANGE_BUFFER
                 Serial.println("Found rotary with the same id, adding");
                 #endif
-                changes[i].after_value += c.after_value;
+                changes[i].after_value += c->after_value;
                 return;
             }
         }
@@ -79,10 +84,10 @@ void ChangeBuffer::appendChange(Change c){
         if(slotUsed[i] == false){
             //Serial.println("Found spot at: "+String(i));
             slotUsed[i] = true;
-            changes[i].id = c.id;
-            changes[i].type = c.type;
-            changes[i].after_value = c.after_value;
-            changes[i].before_value = c.before_value;
+            changes[i].id = c->id;
+            changes[i].type = c->type;
+            changes[i].after_value = c->after_value;
+            changes[i].before_value = c->before_value;
             #ifdef DEBUG_CHANGE_BUFFER
             Serial.println("Change written to buffer at position:"+String(i));
             #endif
@@ -98,13 +103,13 @@ void ChangeBuffer::appendChange(Change c){
      * this is because fresh events are more important than old ones. 
      */
     slotUsed[0] = true;
-    changes[0].id = c.id;
-    changes[0].type = c.type;
-    changes[0].after_value = c.after_value;
-    changes[0].before_value = c.before_value;
+    changes[0].id = c->id;
+    changes[0].type = c->type;
+    changes[0].after_value = c->after_value;
+    changes[0].before_value = c->before_value;
 }
 
-Change ChangeBuffer::popChange(){
+Change * ChangeBuffer::popChange(){
     #ifdef DEBUG_CHANGE_BUFFER
     Serial.println("Popping change from buffer");
     /**
@@ -132,13 +137,12 @@ Change ChangeBuffer::popChange(){
         for(int i = 0; i < this->size; i++){
             if(slotUsed[i] && i > lastPopped){
                 slotUsed[i] = false;
-                Change c;
-                c.id = changes[i].id;
-                c.type = changes[i].type;
-                c.after_value = changes[i].after_value;
-                c.before_value = changes[i].before_value;
+                _c->id = changes[i].id;
+                _c->type = changes[i].type;
+                _c->after_value = changes[i].after_value;
+                _c->before_value = changes[i].before_value;
                 lastPopped = i;
-                return c;
+                return _c;
             }
         }
     }
@@ -152,13 +156,12 @@ Change ChangeBuffer::popChange(){
     for(int i = 0; i < size; i++){
         if(slotUsed[i] == true){
             slotUsed[i] = false;
-            Change c;
-            c.id = changes[i].id;
-            c.type = changes[i].type;
-            c.after_value = changes[i].after_value;
-            c.before_value = changes[i].before_value;
+            _c->id = changes[i].id;
+            _c->type = changes[i].type;
+            _c->after_value = changes[i].after_value;
+            _c->before_value = changes[i].before_value;
             lastPopped = i;
-            return c;
+            return _c;
         }
     }
     #ifdef DEBUG_CHANGE_BUFFER
@@ -167,10 +170,9 @@ Change ChangeBuffer::popChange(){
     /*
     * If no change is found return a change with a null event
     */
-    Change c;
-    c.id = 0;
+    _c->id = 0;
     lastPopped = -1;
-    return c;
+    return _c;
 }
 
 
@@ -178,7 +180,7 @@ void ChangeBuffer::printChanges(){
     for(int i = 0; i < size; i++){
         if(slotUsed[i] == true && changes[i].id>=0){
             int id, before, after;
-            id= changes[i].id;
+            id = changes[i].id;
             before = changes[i].before_value;
             after = changes[i].after_value;
             Serial.println("Change of id #"+String(id)+" from "+String(before) + " -> " + String(after));

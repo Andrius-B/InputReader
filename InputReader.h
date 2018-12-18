@@ -6,7 +6,6 @@
  * Also I modified it - removed the Wire.begin(5,4) in the begin function
  */
 
-#include "Arduino.h"
 #include "Input.h"
 #include "ChangeBuffer.h"
 #include "Change.h"
@@ -27,7 +26,7 @@ class InputReader{
     void addRange(Input ** inputs, int count);
     void readValues();
     void printChanges();
-    Change popChange();
+    Change * popChange();
     int getCount();
     Input * getInputAt(int index);
 };

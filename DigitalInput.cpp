@@ -2,20 +2,23 @@
 #include "DigitalInput.h"
 
 int32_t DigitalInput::read(){
+    // Serial2.println("Reading pin");
     int readVal = digitalRead(pin);
     return this->inverted ? 1-readVal : readVal;
 }
 
-Change DigitalInput::getChange(){
-    int readVal = digitalRead(pin);
-    uint32_t val = this->inverted ? 1-readVal : readVal;
-    if(val != lastReadValue){
-        Change c;
-        c.id = this->id;
-        c.type = this->type;
-        c.after_value = val;
-        c.before_value = lastReadValue;
-        lastReadValue = val;
+Change * DigitalInput::getChange(){
+    int readVal = this->read();
+    if(readVal != lastReadValue){
+        // Serial2.println("Change generated");
+        c->id = this->id;
+        c->type = this->type;
+        c->after_value = readVal;
+        c->before_value = lastReadValue;
+        lastReadValue = readVal;
+        return c;
+    }else{
+        c->id = 0;
         return c;
     }
 }
@@ -23,5 +26,6 @@ Change DigitalInput::getChange(){
 DigitalInput::DigitalInput(uint16_t id, uint8_t pin):Input(id){
     this->type = DIGITAL_INPUT;
     this->pin = pin;
+    this->inverted = false;
     pinMode(pin, INPUT_PULLUP);
 }

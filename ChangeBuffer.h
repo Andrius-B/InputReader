@@ -6,6 +6,7 @@
 
 class ChangeBuffer{
     Change * changes;
+    Change * _c;
     bool * slotUsed;
     int lastPopped = -1;
     int size;
@@ -13,8 +14,8 @@ class ChangeBuffer{
     ChangeBuffer(int size);
     ChangeBuffer();
     void resize(int size);
-    void appendChange(Change c);
-    Change popChange();
+    void appendChange(Change * c);
+    Change * popChange();
     void printChanges();
 };
 #endif

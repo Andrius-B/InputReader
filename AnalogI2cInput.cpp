@@ -13,35 +13,34 @@ AnalogI2cInput::AnalogI2cInput(uint16_t id, uint8_t pin, ADS1015 * sensor): Inpu
     this->pin = pin;
 }
 
-Change AnalogI2cInput::getChange(){
+Change * AnalogI2cInput::getChange(){
+    // Serial.println("Reading analog input!");
     int32_t readValue = this->read();
-    Serial.println("Sensor read:"+String(readValue));
+    // Serial2.println("Sensor read:"+String(readValue));
     if(readValue != this->lastReadValue){
         //Serial.println("Read value is different from the state, creating a change!");
-        Change c;
-        c.before_value = this->lastReadValue;
+        c->before_value = this->lastReadValue;
         this->changeAccumulator =
             (this->changeAccumulator * (1.f-ANALOG_INPUT_ACCUMULATOR_INFLUENCE)) + readValue * ANALOG_INPUT_ACCUMULATOR_INFLUENCE;
         // Serial.println("After accumulating change:"+String((((AnalogI2cInput *) inputs[i])->changeAccumulator)));
-        c.after_value = this->changeAccumulator;
-        readValue = c.after_value;
+        c->after_value = this->changeAccumulator;
+        readValue = c->after_value;
         
-        c.id = this->id;
-        c.type = this->type;
-        #ifdef DEBUG
-        Serial.println("Change created, checking if significant");
-        #endif
-        if(isAnalogChangeSignificant(&c)){
-            #ifdef DEBUG
-            Serial.println("Change Significant, appending to change buffer!");
-            #endif
+        c->id = this->id;
+        c->type = this->type;
+        // #ifdef DEBUG
+        // Serial.println("Change created, checking if significant");
+        // #endif
+        if(isAnalogChangeSignificant(c)){
+            // #ifdef DEBUG
+            // Serial.println("Change Significant, appending to change buffer!");
+            // #endif
             this->lastReadValue = readValue;
             return c;
         }
     }
     //in case a change is not detected
-    Change c;
-    c.id = 0;
+    c->id = 0;
     return c;
 }
 

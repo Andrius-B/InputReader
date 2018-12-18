@@ -8,10 +8,10 @@
 
 class DigitalInput: public Input{
     uint8_t pin;
-    public:
+public:
     bool inverted = false;
     virtual int32_t read();
-    virtual Change getChange();
+    virtual Change * getChange();
     DigitalInput(uint16_t id, uint8_t pin);
 };
 

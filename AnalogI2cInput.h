@@ -12,7 +12,7 @@ class AnalogI2cInput: public Input{
   public:
     AnalogI2cInput(uint16_t id, uint8_t pin, ADS1015 * sensor);
     virtual int32_t read();
-    virtual Change getChange();
+    virtual Change * getChange();
 
     bool isAnalogChangeSignificant(Change * c);
   };

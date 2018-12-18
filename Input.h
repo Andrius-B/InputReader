@@ -6,6 +6,8 @@
 #include "Change.h"
 
 class Input{
+    protected:
+    Change * c;
     public:
     String label;
     uint16_t id;
@@ -13,10 +15,11 @@ class Input{
     uint8_t type;
     Input(uint16_t id){
         this->id = id;
+        c = new Change();
         this->lastReadValue = 0;
     }
     virtual int32_t read() = 0;
-    virtual Change getChange() = 0;
+    virtual Change * getChange() = 0;
 };
 
 #endif

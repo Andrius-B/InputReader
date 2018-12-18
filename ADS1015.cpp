@@ -21,6 +21,7 @@
 #include "Arduino.h"
 
 #include <Wire_slave.h>
+#include <SoftWire.h>
 
 #include "ADS1015.h"
 
@@ -38,6 +39,17 @@ ADS1015::ADS1015(uint8_t i2cAddress, TwoWire * slavePort)
    m_bitShift = 4;
    m_gain = GAIN_TWOTHIRDS; /* +/- 6.144V range (limited to VDD +0.3V max!) */
    this->port = slavePort;
+   this->softPort = nullptr;
+}
+
+ADS1015::ADS1015(uint8_t i2cAddress, SoftWire * slavePort) 
+{
+   m_i2cAddress = i2cAddress;
+   m_conversionDelay = ADS1015_CONVERSIONDELAY;
+   m_bitShift = 4;
+   m_gain = GAIN_TWOTHIRDS; /* +/- 6.144V range (limited to VDD +0.3V max!) */
+   this->softPort = slavePort;
+   this->port = nullptr;
 }
 
 /**************************************************************************/
@@ -111,12 +123,14 @@ uint16_t ADS1015::readADC_SingleEnded(uint8_t channel) {
   // Set 'start single-conversion' bit
   config |= ADS1015_REG_CONFIG_OS_SINGLE;
 
+  // Serial.println("writingRegister!");
   // Write config register to the ADC
   writeRegister(m_i2cAddress, ADS1015_REG_POINTER_CONFIG, config);
 
   // Wait for the conversion to complete
   delay(m_conversionDelay);
 
+  // Serial.println("readingRegister!");
   // Read the conversion results
   // Shift 12-bit results right 4 bits for the ADS1015
   return readRegister(m_i2cAddress, ADS1015_REG_POINTER_CONVERT) >> m_bitShift;  
@@ -159,11 +173,11 @@ int16_t ADS1015::getLastConversionResults()
 */
 /**************************************************************************/
 uint8_t ADS1015::i2cread(void) {
-  #if ARDUINO >= 100
-  return port->read();
-  #else
-  return port->receive();
-  #endif
+  if(port != nullptr){
+    return port->read();
+  }else if(softPort != nullptr){
+    return softPort->read();
+  }
 }
 
 /**************************************************************************/
@@ -172,11 +186,11 @@ uint8_t ADS1015::i2cread(void) {
 */
 /**************************************************************************/
 void ADS1015::i2cwrite(uint8_t x) {
-  #if ARDUINO >= 100
-  port->write((uint8_t)x);
-  #else
-  port->send(x);
-  #endif
+  if(port != nullptr){
+    port->write((uint8_t)x);
+  }else if(softPort != nullptr){
+    softPort->write((uint8_t)x);
+  }
 }
 
 /**************************************************************************/
@@ -185,11 +199,19 @@ void ADS1015::i2cwrite(uint8_t x) {
 */
 /**************************************************************************/
 void ADS1015::writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value) {
-  port->beginTransmission(i2cAddress);
-  i2cwrite((uint8_t)reg);
-  i2cwrite((uint8_t)(value>>8));
-  i2cwrite((uint8_t)(value & 0xFF));
-  port->endTransmission();
+  if(port != nullptr){
+    port->beginTransmission(i2cAddress);
+    i2cwrite((uint8_t)reg);
+    i2cwrite((uint8_t)(value>>8));
+    i2cwrite((uint8_t)(value & 0xFF));
+    port->endTransmission();
+  }else if(softPort != nullptr){
+    softPort->beginTransmission(i2cAddress);
+    i2cwrite((uint8_t)reg);
+    i2cwrite((uint8_t)(value>>8));
+    i2cwrite((uint8_t)(value & 0xFF));
+    softPort->endTransmission();
+  }
 }
 
 /**************************************************************************/
@@ -198,10 +220,18 @@ void ADS1015::writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value) {
 */
 /**************************************************************************/
 uint16_t ADS1015::readRegister(uint8_t i2cAddress, uint8_t reg) {
-  port->beginTransmission(i2cAddress);
-  i2cwrite(ADS1015_REG_POINTER_CONVERT);
-  port->endTransmission();
-  port->requestFrom(i2cAddress, (uint8_t)2);
+  if(port != nullptr){
+    port->beginTransmission(i2cAddress);
+    i2cwrite(ADS1015_REG_POINTER_CONVERT);
+    port->endTransmission();
+    port->requestFrom(i2cAddress, (uint8_t)2);
+    
+  }else if(softPort != nullptr){
+    softPort->beginTransmission(i2cAddress);
+    i2cwrite(ADS1015_REG_POINTER_CONVERT);
+    softPort->endTransmission();
+    softPort->requestFrom(i2cAddress, (uint8_t)2);
+  }
   return ((i2cread() << 8) | i2cread());  
 }
 

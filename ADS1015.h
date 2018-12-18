@@ -23,8 +23,8 @@
 */
 /**************************************************************************/
 
-#include "Wire_slave.h"
-
+#include <Wire_slave.h>
+#include <SoftWire.h>
 #include "Arduino.h"
 
 /*=========================================================================
@@ -121,12 +121,19 @@ typedef enum
 class ADS1015
 {
 protected:
+    enum PORT_TYPES{
+        HARD = 0,
+        SOFT = 1
+    };
+    PORT_TYPES port_type;
    // Instance-specific properties
    uint8_t   m_i2cAddress;
    uint8_t   m_conversionDelay;
    uint8_t   m_bitShift;
    adsGain_t m_gain;
-   TwoWire * port;
+   TwoWire * port = nullptr;
+   SoftWire * softPort = nullptr;
+   uint portSelected;
    uint8_t i2cread(void);
    void i2cwrite(uint8_t x);
    void writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value);
@@ -134,6 +141,7 @@ protected:
 
  public:
   ADS1015(uint8_t i2cAddress, TwoWire * slavePort);
+  ADS1015(uint8_t i2cAddress, SoftWire * slavePort);
   void begin(void);
   uint16_t  readADC_SingleEnded(uint8_t channel);
   int16_t   getLastConversionResults();
