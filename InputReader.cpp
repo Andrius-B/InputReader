@@ -1,8 +1,8 @@
 #include "Arduino.h"
-#include "InputReader.h"
-#include "ChangeBuffer.h"
+#include "InputReader.hpp"
+#include "ChangeBuffer.hpp"
 #include "InputReaderConfig.h"
-#include "DigitalInput.h"
+#include "DigitalInput.hpp"
 
 InputReader::InputReader(int size){
     inputs = new Input*[size];

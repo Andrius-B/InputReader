@@ -2,7 +2,7 @@
 #define _DIGITAL_INPUT_H
 
 #include <stdint.h>
-#include "Input.h"
+#include "Input.hpp"
 #include "Change.h"
 #include "InputMappings.h"
 

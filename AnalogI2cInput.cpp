@@ -1,7 +1,7 @@
 #include "InputMappings.h"
-#include "AnalogI2cInput.h"
+#include "AnalogI2cInput.hpp"
 #include "InputReaderConfig.h"
-#include "ADS1015.h"
+#include "ADS1015.hpp"
 
 int32_t AnalogI2cInput::read(){
     return sensor->readADC_SingleEnded(pin);

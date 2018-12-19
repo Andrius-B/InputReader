@@ -6,8 +6,8 @@
  * Also I modified it - removed the Wire.begin(5,4) in the begin function
  */
 
-#include "Input.h"
-#include "ChangeBuffer.h"
+#include "Input.hpp"
+#include "ChangeBuffer.hpp"
 #include "Change.h"
 #include "InputMappings.h"
 

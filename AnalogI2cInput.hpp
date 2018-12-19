@@ -1,8 +1,8 @@
 #ifndef _ANALOG_I2C_INPUT_H
 #define _ANALOG_I2C_INPUT_H
 
-#include "Input.h"
-#include "ADS1015.h"
+#include "Input.hpp"
+#include "ADS1015.hpp"
 
 class AnalogI2cInput: public Input{
   private:

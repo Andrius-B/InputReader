@@ -23,7 +23,7 @@
 #include <Wire_slave.h>
 #include <SoftWire.h>
 
-#include "ADS1015.h"
+#include "ADS1015.hpp"
 
 
 

@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "DigitalInput.h"
+#include "DigitalInput.hpp"
 
 int32_t DigitalInput::read(){
     // Serial2.println("Reading pin");

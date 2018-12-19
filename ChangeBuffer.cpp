@@ -1,4 +1,4 @@
-#include "ChangeBuffer.h"
+#include "ChangeBuffer.hpp"
 #include "InputMappings.h"
 
 // #define DEBUG_CHANGE_BUFFER
