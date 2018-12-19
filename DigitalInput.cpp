@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "DigitalInput.hpp"
+#include "MidiProtocol.h"
 
 int32_t DigitalInput::read(){
     // Serial2.println("Reading pin");
@@ -7,19 +8,21 @@ int32_t DigitalInput::read(){
     return this->inverted ? 1-readVal : readVal;
 }
 
-Change * DigitalInput::getChange(){
+Message * DigitalInput::getMessage(){
     int readVal = this->read();
     if(readVal != lastReadValue){
         // Serial2.println("Change generated");
-        c->id = this->id;
-        c->type = this->type;
-        c->after_value = readVal;
-        c->before_value = lastReadValue;
+        m->setType(MESSAGE_TYPE_MIDI);
+        m->setSubType(MIDI_NONOVERRIDABLE);
+        m->setMidiMessage(
+            readVal ? MIDI_NOTE_ON : MIDI_NOTE_OFF,
+            this->id % 127,
+            127);
         lastReadValue = readVal;
-        return c;
+        return m;
     }else{
-        c->id = 0;
-        return c;
+        m->setSizeUsed(0);
+        return m;
     }
 }
 

@@ -1,5 +1,5 @@
-#include "ChangeBuffer.hpp"
-#include "InputMappings.h"
+#include "InputReader/ChangeBuffer.h"
+#include "InputReader/InputMappings.h"
 
 // #define DEBUG_CHANGE_BUFFER
 

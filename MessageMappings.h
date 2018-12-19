@@ -1,9 +1,11 @@
 #pragma once
 
 // the main types of messages:
+#define MESSAGE_TYPE_INVALID                0x0
 #define MESSAGE_TYPE_REQUEST			    0x1
 #define MESSAGE_TYPE_RESPONSE				0x2
 #define MESSAGE_TYPE_DATA					0x3
+#define MESSAGE_TYPE_MIDI                   0x4 //this assumes that the message in the databytes is a valid USB-MIDI message
 
 // sub-types:
 //-------Request subtypes:
@@ -16,3 +18,7 @@
 
 //-------Data subtypes
 #define INPUT_CHANGE		                0x1
+
+//-------Midi sub-types
+#define MIDI_OVERRIDABLE                    0x1
+#define MIDI_NONOVERRIDABLE                 0x2

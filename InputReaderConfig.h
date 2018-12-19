@@ -23,5 +23,7 @@
  * */
 #define ANALOG_INPUT_MIN_SIGNIFICANT_CHANGE 3
 
+// This limitation is here to keep a track on memory allocation for buffers
+#define MESSAGE_MAX_SIZE 16
 
 #endif

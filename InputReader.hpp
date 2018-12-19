@@ -7,17 +7,17 @@
  */
 
 #include "Input.hpp"
-#include "ChangeBuffer.hpp"
+#include "MessageBuffer.hpp"
 #include "Change.h"
 #include "InputMappings.h"
 
 
-#define CHANGE_BUF_SIZE 35
+#define MESSAGE_BUF_SIZE 30
 
 class InputReader{
     private:
     Input ** inputs;
-    ChangeBuffer changes;
+    MessageBuffer messageBuf;
     int inputs_size;
     int count;
     public:
@@ -25,8 +25,8 @@ class InputReader{
     void add(Input * input);
     void addRange(Input ** inputs, int count);
     void readValues();
-    void printChanges();
-    Change * popChange();
+    void printMessages();
+    Message * popMessage();
     int getCount();
     Input * getInputAt(int index);
 };

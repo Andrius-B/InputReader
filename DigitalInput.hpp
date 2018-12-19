@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "Input.hpp"
-#include "Change.h"
+#include "Message.hpp"
 #include "InputMappings.h"
 
 class DigitalInput: public Input{
@@ -11,7 +11,7 @@ class DigitalInput: public Input{
 public:
     bool inverted = false;
     virtual int32_t read();
-    virtual Change * getChange();
+    virtual Message * getMessage();
     DigitalInput(uint16_t id, uint8_t pin);
 };
 
