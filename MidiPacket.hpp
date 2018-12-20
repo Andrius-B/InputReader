@@ -2,6 +2,9 @@
 #define __MIDIPACKET_H
 #include <stdint.h>
 
+/*
+    A light abstraction on the USB-MIDI packet sent to the PC
+*/
 class MidiPacket{
 private:
     uint8_t wrIndex;

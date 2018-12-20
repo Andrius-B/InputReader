@@ -6,13 +6,16 @@
 	Class for an abstract message:
 	| 1b  |		1b		  | n-bytes..|
 	| len | type, subtype | data.... |
+
+	This type of message is transfered between all the microcontrollers.
+	Some messages are converted to midi packets and sent to the PC by the master.
 */
 class Message {
 protected:
 	uint8_t sizeAllocated;
 public:
 	uint8_t * data;
-	
+
 	Message(uint8_t preallocateSize) {
 		sizeAllocated = preallocateSize;
 		data = new uint8_t[preallocateSize];
@@ -27,7 +30,7 @@ public:
 		uint8_t len = other->getSizeUsed();
 		if(this->sizeAllocated < len){
 			len = this->sizeAllocated;
-			Serial.println("Truncating message, because of size missmatch!");
+			// Serial.println("Truncating message, because of size missmatch!");
 		}
 		for(int i = 0; i < len; i++){
 			this->data[i] = other->getRawBytes()[i];
@@ -87,6 +90,11 @@ public:
 		data[index + 2] = value;
 	}
 
+	uint8_t getDataLen(){
+		 // there are currently 2 hearder bytes per message
+		return (getSizeUsed() - 2) > 0 ? (getSizeUsed() - 2) : 0;
+	}
+
 	void setMidiMessage(uint8_t messageType, uint8_t byte1, uint8_t byte2){
 		this->setMidiMessage(0, messageType, byte1, byte2);
 	}
@@ -97,6 +105,8 @@ public:
         this->data[4] = byte1;
         this->data[5] = byte2;
 		this->setSizeUsed(6);
+		this->setType(MESSAGE_TYPE_MIDI);
+		this->setSubType(MIDI_NONOVERRIDABLE);
 	}
 
 	uint8_t * getDataBytes() {

@@ -17,7 +17,7 @@
 #define STATUS_RESPONSE			            0x2
 
 //-------Data subtypes
-#define INPUT_CHANGE		                0x1
+// #define INPUT_CHANGE		                0x1 //depricated
 
 //-------Midi sub-types
 #define MIDI_OVERRIDABLE                    0x1
