@@ -36,6 +36,14 @@ public:
         midiMessageCount++;
     }
 
+    void copyFromBuffer(uint8_t * buf, uint16_t len){
+        for(uint16_t i = 0; i < len; i++){
+            buffer[wrIndex++] = buf[i];
+        }
+        bufferCount += (uint8_t)len;
+        midiMessageCount = int(wrIndex/4);
+    }
+
     void reset(){
         for(uint8_t i = 0; i <= wrIndex; i++){
             buffer[i] = 0;
@@ -44,6 +52,24 @@ public:
         rdIndex = 0;
         bufferCount = 0;
         midiMessageCount = 0;
+    }
+
+    uint8_t getType(){
+         // the second half of the first byte is the message type
+         // according to spec
+        return buffer[0] & 0x0F;
+    }
+
+    uint8_t getStatusByte(){
+        return buffer[1];
+    }
+
+    uint8_t getDataByte1(){
+        return buffer[2];
+    }
+
+    uint8_t getDataByte2(){
+        return buffer[3];
     }
 };
 

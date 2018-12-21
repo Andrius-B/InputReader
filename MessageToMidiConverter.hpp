@@ -1,6 +1,7 @@
 #ifndef _MESSAGEToMIDICONVERTER_H
 #define _MESSAGEToMIDICONVERTER_H
 #include <stdint.h>
+#include "dbg.h"
 #include "Message.hpp"
 #include "MidiPacket.hpp"
 #include "MessageMappings.h"
@@ -10,7 +11,6 @@
 class MessageToMidiConverter{
 private:
     MidiPacket * midiPacket;
-    Message * msg;
 
     void writeMidiMessageToPacket(uint8_t messageType, uint8_t byte1, uint8_t byte2){
         midiPacket->writeByte(((0 & 0xF) << 4) | (messageType & 0xF)); // there is a "Cable" sent over, not used as of yet
@@ -21,17 +21,45 @@ private:
 public:
     MessageToMidiConverter(){
         midiPacket = new MidiPacket(64);
-        msg = new Message(64);
+        for(uint8_t i = 0; i < 64; i++){
+            midiPacket->buffer[i] = 0;
+        }
     }
-    void convertMessageToMidiPacket(Message * msg){
+    MidiPacket * convertMessageToMidiPacket(Message * m){
         uint8_t midiType;
         midiPacket->reset();
-        if(msg->getType() == MESSAGE_TYPE_MIDI){
+        if(m->getType() == MESSAGE_TYPE_MIDI){
             // writeMidiMessageToPacket(midiType, msg->getDataByte(0), 0);
-            for(int i = 0; i < msg->getDataLen(); i++){
-                midiPacket->writeByte(msg->getDataByte(i));
+            for(int i = 0; i < m->getDataLen(); i++){
+                midiPacket->writeByte(m->getDataByte(i));
             }
         }
+        return midiPacket;
+    }
+
+    Message * convertMidiPacketToMessage(MidiPacket * midi, Message * m){
+
+        println("Midi packet to be converted:");
+        for(uint8_t i = 0; i < 16; i++){
+        printnum(midi->buffer[i]);print(", ");
+        }
+        print("\n");
+
+        m->setType(MESSAGE_TYPE_MIDI);
+        m->setSubType(MIDI_NONOVERRIDABLE);
+        for(int i = 0; i < 5;i ++){
+            m->data[i+2] = midi->buffer[i];
+        }
+        m->setSizeUsed(6);
+
+        println("Midi converted to message:");
+        for(uint8_t i = 0; i < 16; i++){
+        printnum(m->data[i]);print(", ");
+        }
+        print("\n");
+        print("MIDI message len:");printnum(m->getSizeUsed());
+        print("\n");
+        return m;
     }
 
     uint8_t * getMidiPacketBytes(){

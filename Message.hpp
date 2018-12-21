@@ -96,11 +96,11 @@ public:
 	}
 
 	void setMidiMessage(uint8_t messageType, uint8_t byte1, uint8_t byte2){
-		this->setMidiMessage(0, messageType, byte1, byte2);
+		this->setMidiMessage(0, 0, messageType, byte1, byte2);
 	}
 
-	void setMidiMessage(uint8_t channel, uint8_t messageType, uint8_t byte1, uint8_t byte2){
-		this->data[2] = (((channel & 0xF) << 4) | (messageType & 0xF)); // there is a "Cable" sent over, not used as of yet
+	void setMidiMessage(uint8_t cable, uint8_t channel, uint8_t messageType, uint8_t byte1, uint8_t byte2){
+		this->data[2] = (((cable & 0xF) << 4) | (messageType & 0xF)); // there is a "Cable" sent over, not used as of yet
         this->data[3] = ((messageType & 0xF) << 4 | (channel & 0xF));
         this->data[4] = byte1;
         this->data[5] = byte2;
