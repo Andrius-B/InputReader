@@ -6,7 +6,13 @@
 #include "MessageMappings.h"
 
 int32_t AnalogI2cInput::read(){
-    return sensor->readADC_SingleEnded(pin);
+    int32_t readValue = sensor->readADC_SingleEnded(pin);
+    if(!this->initialized){
+        changeAccumulator = readValue;
+        this->lastReadValue = readValue;
+        this->initialized = true;
+    }
+    return readValue;
 }
 
 AnalogI2cInput::AnalogI2cInput(uint16_t id, uint8_t pin, ADS1015 * sensor): Input(id){
@@ -18,7 +24,7 @@ AnalogI2cInput::AnalogI2cInput(uint16_t id, uint8_t pin, ADS1015 * sensor): Inpu
 Message * AnalogI2cInput::getMessage(){
     // Serial.println("Reading analog input!");
     int32_t readValue = this->read();
-    Serial2.println("Sensor read:"+String(readValue));
+    // Serial2.println("Sensor read:"+String(readValue));
     if(readValue != this->lastReadValue){
         //Serial.println("Read value is different from the state, creating a change!");
         // c->before_value = this->lastReadValue;

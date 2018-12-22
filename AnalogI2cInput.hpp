@@ -9,6 +9,7 @@ class AnalogI2cInput: public Input{
   ADS1015 * sensor;
   int pin;
   uint32_t changeAccumulator = 0;
+  bool initialized = false;
   public:
     AnalogI2cInput(uint16_t id, uint8_t pin, ADS1015 * sensor);
     virtual int32_t read();
