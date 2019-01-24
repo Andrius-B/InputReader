@@ -1,4 +1,5 @@
 Software License Agreement (BSD License)
+// ONLY VALID FOR FILES ADS1015.hpp and ADS1015.cpp
 
 Copyright (c) 2012, Adafruit Industries
 All rights reserved.

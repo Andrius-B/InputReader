@@ -1,6 +1,5 @@
 #include "Arduino.h"
 #include "InputReader.hpp"
-#include "MessageBuffer.hpp"
 #include "InputReaderConfig.h"
 #include "DigitalInput.hpp"
 
@@ -38,8 +37,16 @@ void InputReader::addRange(Input ** inputs, int count){
     }
 }
 
-Message * InputReader::popMessage(){
-    return messageBuf.popMessage();
+Message * InputReader::findMessageFromInput(){
+    Message * m = inputs[lastInputRead]->getMessage();
+    uint16_t iter_cnt = 0;
+    while(m->getSizeUsed() == 0 && iter_cnt < this->count){
+        iter_cnt++;
+        lastInputRead = (lastInputRead + 1) % this->count;
+        m = inputs[lastInputRead]->getMessage();
+    }
+    lastInputRead = (lastInputRead + 1) % this->count;
+    return m;
 }
 
 void InputReader::readValues(){
@@ -47,16 +54,8 @@ void InputReader::readValues(){
     // Serial.println("Reading values!");
     #endif
     for(int i = 0; i < count; i++){
-        Message * m = inputs[i]->getMessage();
-        if(m->getType() != MESSAGE_TYPE_INVALID && m->getSizeUsed() > 0){
-            // Serial2.println("Change of input:"+String(inputs[i]->label));
-            messageBuf.appendMessage(m);
-        }
+        inputs[i]->read();
     }
-}
-
-void InputReader::printMessages(){
-    messageBuf.printMessages();
 }
 
 int InputReader::getCount(){
